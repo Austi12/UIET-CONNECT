@@ -1,0 +1,276 @@
+// This is your Prisma schema file
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum UserRole {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum ClassroomStatus {
+  FREE
+  OCCUPIED
+  RESERVED
+}
+
+enum ProjectStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ItemStatus {
+  ACTIVE
+  CLAIMED
+  EXPIRED
+}
+
+// ==================== USERS & AUTH ====================
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String   @map("password_hash")
+  name          String
+  role          UserRole @default(STUDENT)
+  department    String?
+  year          Int?
+  rollNumber    String?  @unique @map("roll_number")
+  phoneNumber   String?  @map("phone_number")
+  isApproved    Boolean  @default(false) @map("is_approved")
+  isActive      Boolean  @default(true) @map("is_active")
+  profileImage  String?  @map("profile_image")
+  
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  sessions           Session[]
+  classroomLogs      ClassroomLog[]
+  lostItems          LostItem[]
+  foundItems         FoundItem[]
+  projects           Project[]
+  eventRegistrations EventRegistration[]
+  createdEvents      Event[]              @relation("EventCreator")
+  chatMessages       ChatMessage[]
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  token        String   @unique
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  expiresAt    DateTime @map("expires_at")
+  
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// ==================== CLASSROOMS ====================
+
+model Classroom {
+  id           String          @id @default(uuid())
+  name         String
+  building     String
+  floor        Int
+  capacity     Int
+  status       ClassroomStatus @default(FREE)
+  features     String[]        // e.g., ["projector", "ac", "whiteboard"]
+  description  String?
+  imageUrl     String?         @map("image_url")
+  
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  logs ClassroomLog[]
+
+  @@map("classrooms")
+}
+
+model ClassroomLog {
+  id           String          @id @default(uuid())
+  classroomId  String          @map("classroom_id")
+  userId       String          @map("user_id")
+  previousStatus ClassroomStatus @map("previous_status")
+  newStatus    ClassroomStatus @map("new_status")
+  reason       String?
+  
+  createdAt    DateTime        @default(now()) @map("created_at")
+
+  classroom Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@map("classroom_logs")
+}
+
+// ==================== LOST & FOUND ====================
+
+model LostItem {
+  id          String     @id @default(uuid())
+  userId      String     @map("user_id")
+  title       String
+  description String
+  category    String     // e.g., "electronics", "documents", "accessories"
+  location    String     // Where it was lost
+  lostDate    DateTime   @map("lost_date")
+  status      ItemStatus @default(ACTIVE)
+  imageUrl    String     @map("image_url")
+  contactInfo String?    @map("contact_info")
+  
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  user      User            @relation(fields: [userId], references: [id])
+  embedding ItemEmbedding? @relation("LostItemEmbedding")
+
+
+  @@map("lost_items")
+}
+
+model FoundItem {
+  id          String     @id @default(uuid())
+  userId      String     @map("user_id")
+  title       String
+  description String
+  category    String
+  location    String     // Where it was found
+  foundDate   DateTime   @map("found_date")
+  status      ItemStatus @default(ACTIVE)
+  imageUrl    String     @map("image_url")
+  contactInfo String?    @map("contact_info")
+  
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  user      User            @relation(fields: [userId], references: [id])
+  embedding ItemEmbedding? @relation("FoundItemEmbedding")
+
+
+  @@map("found_items")
+}
+
+model ItemEmbedding {
+  id          String   @id @default(uuid())
+
+  lostItemId  String?  @unique
+  foundItemId String?  @unique
+
+  lostItem  LostItem?  @relation("LostItemEmbedding", fields: [lostItemId], references: [id], onDelete: Cascade)
+  foundItem FoundItem? @relation("FoundItemEmbedding", fields: [foundItemId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+
+
+// ==================== PROJECTS ====================
+
+model Project {
+  id          String        @id @default(uuid())
+  userId      String        @map("user_id")
+  title       String
+  description String
+  techStack   String[]      @map("tech_stack")
+  githubUrl   String?       @map("github_url")
+  liveUrl     String?       @map("live_url")
+  imageUrl    String?       @map("image_url")
+  status      ProjectStatus @default(DRAFT)
+  featured    Boolean       @default(false)
+  likes       Int           @default(0)
+  views       Int           @default(0)
+  
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("projects")
+}
+
+// ==================== EVENTS ====================
+
+model Event {
+  id            String   @id @default(uuid())
+  title         String
+  description   String
+  organizer     String
+  creatorId     String   @map("creator_id")
+  eventDate     DateTime @map("event_date")
+  endDate       DateTime? @map("end_date")
+  location      String
+  venue         String?
+  maxCapacity   Int?     @map("max_capacity")
+  imageUrl      String?  @map("image_url")
+  category      String   // "workshop", "seminar", "competition", "club"
+  isPublished   Boolean  @default(false) @map("is_published")
+  registrationDeadline DateTime? @map("registration_deadline")
+  
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  creator       User                @relation("EventCreator", fields: [creatorId], references: [id])
+  registrations EventRegistration[]
+
+  @@map("events")
+}
+
+model EventRegistration {
+  id         String   @id @default(uuid())
+  eventId    String   @map("event_id")
+  userId     String   @map("user_id")
+  status     String   @default("registered") // "registered", "attended", "cancelled"
+  
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+  @@map("event_registrations")
+}
+
+// ==================== CHATBOT ====================
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  message   String
+  response  String
+  context   Json?    // Store any relevant context
+  
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("chat_messages")
+}
+
+// ==================== SYSTEM ====================
+
+model SystemConfig {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String
+  
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("system_config")
+}
