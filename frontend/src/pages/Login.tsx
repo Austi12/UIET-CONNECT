@@ -30,7 +30,7 @@ const Login = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-8">
+    <div className="bg-red-500 p-20">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Sign In</h2>
 
       {error && (

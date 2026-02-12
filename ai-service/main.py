@@ -7,6 +7,9 @@ from io import BytesIO
 from PIL import Image
 import os
 from dotenv import load_dotenv
+from fastapi import Form
+import json
+
 
 # Load environment variables
 load_dotenv()
@@ -123,68 +126,97 @@ async def generate_embedding_endpoint(
 @app.post("/match-items")
 async def match_items_endpoint(
     file: UploadFile = File(...),
-    embeddings_db: List[dict] = None
+    embeddings_db: Optional[str] = Form(None)
 ):
     """
     Find similar items by comparing embeddings
     
     Args:
         file: Image file to search for
-        embeddings_db: List of existing embeddings with metadata
+        embeddings_db: JSON string of embeddings list
         
     Returns:
         List of matching items with similarity scores
     """
     try:
-        # Read and process image
+        # Validate image
+        if not file.content_type.startswith('image/'):
+            raise HTTPException(status_code=400, detail="File must be an image")
+
+        # Read image
         contents = await file.read()
         image = Image.open(BytesIO(contents))
-        
+
         if image.mode != 'RGB':
             image = image.convert('RGB')
-        
+
         # Generate embedding for query image
         query_embedding = generate_embedding(image, feature_extractor)
-        
-        # If no embeddings provided, return empty
+
+        # Parse embeddings_db safely
+        if embeddings_db:
+            try:
+                embeddings_db = json.loads(embeddings_db)
+            except json.JSONDecodeError:
+                raise HTTPException(
+                    status_code=400,
+                    detail="embeddings_db must be valid JSON"
+                )
+        else:
+            embeddings_db = []
+
+        if not isinstance(embeddings_db, list):
+            raise HTTPException(
+                status_code=400,
+                detail="embeddings_db must be a list"
+            )
+
+        # If no embeddings provided
         if not embeddings_db:
             return {
                 "success": True,
                 "matches": [],
                 "message": "No items to compare against"
             }
-        
+
         # Compute similarities
         matches = []
+
         for item in embeddings_db:
-            stored_embedding = np.array(item.get('embedding', []))
+            stored_embedding = np.array(item.get("embedding", []))
+
             if len(stored_embedding) == 0:
                 continue
-            
+
             similarity = compute_similarity(query_embedding, stored_embedding)
-            
-            if similarity >= float(os.getenv('SIMILARITY_THRESHOLD', '0.75')):
+
+            threshold = float(os.getenv("SIMILARITY_THRESHOLD", "0.75"))
+
+            if similarity >= threshold:
                 matches.append({
-                    "item_id": item.get('item_id'),
-                    "item_type": item.get('item_type'),
+                    "item_id": item.get("item_id"),
+                    "item_type": item.get("item_type"),
                     "similarity_score": float(similarity),
-                    "metadata": item.get('metadata', {})
+                    "metadata": item.get("metadata", {})
                 })
-        
-        # Sort by similarity score (descending)
-        matches.sort(key=lambda x: x['similarity_score'], reverse=True)
-        
-        # Return top K matches
-        top_k = int(os.getenv('TOP_K_MATCHES', '5'))
-        
+
+        # Sort matches by similarity (descending)
+        matches.sort(key=lambda x: x["similarity_score"], reverse=True)
+
+        top_k = int(os.getenv("TOP_K_MATCHES", "5"))
+
         return {
             "success": True,
             "matches": matches[:top_k],
             "total_compared": len(embeddings_db)
         }
-    
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error matching items: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error matching items: {str(e)}"
+        )
+
 
 if __name__ == "__main__":
     import uvicorn
