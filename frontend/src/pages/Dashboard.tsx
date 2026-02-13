@@ -1,6 +1,7 @@
 import { useAuthStore } from '../store/authStore';
 import { DoorOpen, Search, FolderKanban, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PageContainer, SectionHeader, Card, CardContent } from '../components/ui';
 
 const Dashboard = () => {
   const { user } = useAuthStore();
@@ -11,75 +12,93 @@ const Dashboard = () => {
       description: 'View available classrooms in real-time',
       icon: DoorOpen,
       link: '/classrooms',
-      color: 'bg-blue-500',
+      gradient: 'from-neutral-900 to-neutral-800',
     },
     {
       title: 'Lost & Found',
       description: 'AI-powered lost item matching',
       icon: Search,
       link: '/lost-found',
-      color: 'bg-purple-500',
+      gradient: 'from-neutral-900 to-neutral-800',
     },
     {
       title: 'Projects',
       description: 'Showcase your student projects',
       icon: FolderKanban,
       link: '/projects',
-      color: 'bg-green-500',
+      gradient: 'from-neutral-900 to-neutral-800',
     },
     {
       title: 'Events',
       description: 'Register for campus events',
       icon: Calendar,
       link: '/events',
-      color: 'bg-orange-500',
+      gradient: 'from-neutral-900 to-neutral-800',
     },
   ];
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
       {/* Welcome Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Welcome back, {user?.name}!
-        </h1>
-        <p className="text-gray-600">
-          {user?.department && user?.year 
-            ? `${user.department} - Year ${user.year}`
-            : 'UIET Connect Dashboard'}
-        </p>
-      </div>
+      <Card className="mb-8 glass">
+        <CardContent className="py-8">
+          <h1 className="text-3xl font-bold text-white mb-3">
+            Welcome back, {user?.name}!
+          </h1>
+          <p className="text-neutral-400">
+            {user?.department && user?.year 
+              ? `${user.department} - Year ${user.year}`
+              : 'UIET Connect Dashboard'}
+          </p>
+        </CardContent>
+      </Card>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Quick Access Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {cards.map((card) => {
           const Icon = card.icon;
           return (
             <Link
               key={card.title}
               to={card.link}
-              className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6"
+              className="group"
             >
-              <div className={`w-12 h-12 ${card.color} rounded-lg flex items-center justify-center mb-4`}>
-                <Icon className="text-white" size={24} />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {card.title}
-              </h3>
-              <p className="text-sm text-gray-600">{card.description}</p>
+              <Card hover className={`h-full bg-gradient-to-br ${card.gradient}`}>
+                <CardContent className="py-8">
+                  <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-200">
+                    <Icon className="text-black" size={28} />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-white transition-colors">
+                    {card.title}
+                  </h3>
+                  <p className="text-sm text-neutral-400 group-hover:text-neutral-300 transition-colors">
+                    {card.description}
+                  </p>
+                </CardContent>
+              </Card>
             </Link>
           );
         })}
       </div>
 
       {/* Recent Activity Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
-        <div className="text-center py-8 text-gray-500">
-          <p>No recent activity to display</p>
-        </div>
-      </div>
-    </div>
+      <Card>
+        <CardContent>
+          <SectionHeader
+            title="Recent Activity"
+            subtitle="Your latest interactions"
+          />
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-neutral-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </div>
+            <p className="text-neutral-500">No recent activity to display</p>
+          </div>
+        </CardContent>
+      </Card>
+    </PageContainer>
   );
 };
 

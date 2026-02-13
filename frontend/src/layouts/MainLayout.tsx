@@ -33,39 +33,65 @@ const MainLayout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-secondary">
-      {/* Top Navbar */}
-      <nav className="bg-white border-b border-gray-200 fixed w-full z-30">
+    <div className="min-h-screen bg-black">
+      {/* Top Navbar - Mobile */}
+      <nav className="lg:hidden bg-neutral-950 border-b border-neutral-800 fixed w-full z-30">
         <div className="px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="lg:hidden p-2 rounded-md hover:bg-gray-100"
-            >
-              {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-            <h1 className="text-xl font-bold text-primary">UIET Connect</h1>
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="p-2 rounded-xl hover:bg-neutral-800 transition-colors"
+          >
+            {isSidebarOpen ? <X size={20} className="text-white" /> : <Menu size={20} className="text-white" />}
+          </button>
+          
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <span className="text-white font-semibold">UIET</span>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:block">
-              <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-              <p className="text-xs text-gray-500">{user?.role}</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-semibold">
-              {user?.name?.charAt(0).toUpperCase()}
-            </div>
+          <div className="w-10 h-10 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white font-semibold">
+            {user?.name?.charAt(0).toUpperCase()}
           </div>
         </div>
       </nav>
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white border-r border-gray-200 z-20 transform transition-transform duration-200 ease-in-out ${
+        className={`fixed left-0 top-0 h-screen w-64 bg-neutral-950 border-r border-neutral-800 z-40 transform transition-transform duration-200 ease-in-out ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0`}
       >
-        <nav className="p-4 space-y-1">
+        {/* Logo */}
+        <div className="h-16 px-6 flex items-center gap-3 border-b border-neutral-800">
+          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <div className="hidden lg:block">
+            <h1 className="text-lg font-bold text-white">UIET Connect</h1>
+          </div>
+        </div>
+
+        {/* User Info - Desktop */}
+        <div className="hidden lg:block px-4 py-4 border-b border-neutral-800">
+          <div className="flex items-center gap-3 px-2">
+            <div className="w-10 h-10 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white font-semibold flex-shrink-0">
+              {user?.name?.charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-white truncate">{user?.name}</p>
+              <p className="text-xs text-neutral-400">{user?.role}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -74,52 +100,53 @@ const MainLayout = () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setIsSidebarOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
                   isActive
-                    ? 'bg-primary text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-white text-black'
+                    : 'text-neutral-400 hover:text-white hover:bg-neutral-900'
                 }`}
               >
-                <Icon size={20} />
+                <Icon size={20} className={isActive ? 'text-black' : 'group-hover:scale-110 transition-transform'} />
                 <span className="font-medium">{item.label}</span>
               </Link>
             );
           })}
-
-          <div className="pt-4 mt-4 border-t border-gray-200 space-y-1">
-            <Link
-              to="/profile"
-              onClick={() => setIsSidebarOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                location.pathname === '/profile'
-                  ? 'bg-primary text-white'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              <User size={20} />
-              <span className="font-medium">Profile</span>
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
-            >
-              <LogOut size={20} />
-              <span className="font-medium">Logout</span>
-            </button>
-          </div>
         </nav>
+
+        {/* Bottom Actions */}
+        <div className="p-4 border-t border-neutral-800 space-y-1">
+          <Link
+            to="/profile"
+            onClick={() => setIsSidebarOpen(false)}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+              location.pathname === '/profile'
+                ? 'bg-white text-black'
+                : 'text-neutral-400 hover:text-white hover:bg-neutral-900'
+            }`}
+          >
+            <User size={20} className={location.pathname === '/profile' ? 'text-black' : 'group-hover:scale-110 transition-transform'} />
+            <span className="font-medium">Profile</span>
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-400 hover:text-red-400 hover:bg-red-950/20 transition-all duration-200 group"
+          >
+            <LogOut size={20} className="group-hover:scale-110 transition-transform" />
+            <span className="font-medium">Logout</span>
+          </button>
+        </div>
       </aside>
 
       {/* Mobile overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden backdrop-blur-sm"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Main Content */}
-      <main className="pt-16 lg:pl-64 min-h-screen">
+      <main className="lg:pl-64 pt-16 lg:pt-0 min-h-screen">
         <div className="p-4 sm:p-6 lg:p-8">
           <Outlet />
         </div>

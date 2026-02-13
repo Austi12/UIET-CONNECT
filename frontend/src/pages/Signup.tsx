@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
+import { Button, Input, Select } from '../components/ui';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -55,174 +56,146 @@ const Signup = () => {
 
   if (success) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-8">
+      <div className="p-8">
         <div className="text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 bg-green-950 border border-green-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Registration Successful!</h2>
-          <p className="text-gray-600 mb-4">
+          <h2 className="text-2xl font-bold text-white mb-3">Registration Successful!</h2>
+          <p className="text-neutral-400 mb-4">
             Your account has been created and is pending admin approval. You will be able to login once approved.
           </p>
-          <p className="text-sm text-gray-500">Redirecting to login...</p>
+          <div className="inline-flex items-center gap-2 text-sm text-neutral-500">
+            <div className="w-4 h-4 border-2 border-neutral-700 border-t-white rounded-full animate-spin"></div>
+            Redirecting to login...
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-8 max-h-[90vh] overflow-y-auto">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Create Account</h2>
+    <div className="p-8 max-h-[80vh] overflow-y-auto custom-scrollbar">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-white mb-2">Create Account</h2>
+        <p className="text-neutral-400 text-sm">Join the UIET Connect platform</p>
+      </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
+        <div className="mb-6 p-4 bg-red-950/50 border border-red-800 rounded-xl text-red-400 text-sm backdrop-blur-sm">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-            Full Name *
-          </label>
-          <input
-            type="text"
-            id="name"
-            required
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <Input
+          type="text"
+          label="Full Name"
+          required
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          placeholder="John Doe"
+        />
 
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email *
-          </label>
-          <input
-            type="email"
-            id="email"
-            required
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="your.email@puchd.ac.in"
-          />
-        </div>
+        <Input
+          type="email"
+          label="Email Address"
+          required
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          placeholder="your.email@puchd.ac.in"
+        />
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password *
-            </label>
-            <input
-              type="password"
-              id="password"
-              required
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
+          <Input
+            type="password"
+            label="Password"
+            required
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            placeholder="Min. 8 characters"
+          />
 
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-              Confirm Password *
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              required
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
+          <Input
+            type="password"
+            label="Confirm Password"
+            required
+            value={formData.confirmPassword}
+            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+            placeholder="Repeat password"
+          />
         </div>
 
-        <div>
-          <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">
-            Department
-          </label>
-          <select
-            id="department"
-            value={formData.department}
-            onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+        <Select
+          label="Department"
+          value={formData.department}
+          onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+        >
+          <option value="">Select Department</option>
+          <option value="CSE">Computer Science & Engineering</option>
+          <option value="IT">Information Technology</option>
+          <option value="ECE">Electronics & Communication</option>
+          <option value="EE">Electrical Engineering</option>
+          <option value="ME">Mechanical Engineering</option>
+          <option value="CE">Civil Engineering</option>
+        </Select>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Select
+            label="Year"
+            value={formData.year}
+            onChange={(e) => setFormData({ ...formData, year: e.target.value })}
           >
-            <option value="">Select Department</option>
-            <option value="CSE">Computer Science & Engineering</option>
-            <option value="IT">Information Technology</option>
-            <option value="ECE">Electronics & Communication</option>
-            <option value="EE">Electrical Engineering</option>
-            <option value="ME">Mechanical Engineering</option>
-            <option value="CE">Civil Engineering</option>
-          </select>
-        </div>
+            <option value="">Select Year</option>
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+          </Select>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-1">
-              Year
-            </label>
-            <select
-              id="year"
-              value={formData.year}
-              onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="">Select Year</option>
-              <option value="1">1st Year</option>
-              <option value="2">2nd Year</option>
-              <option value="3">3rd Year</option>
-              <option value="4">4th Year</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="rollNumber" className="block text-sm font-medium text-gray-700 mb-1">
-              Roll Number
-            </label>
-            <input
-              type="text"
-              id="rollNumber"
-              value={formData.rollNumber}
-              onChange={(e) => setFormData({ ...formData, rollNumber: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
-            Phone Number
-          </label>
-          <input
-            type="tel"
-            id="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="10-digit number"
+          <Input
+            type="text"
+            label="Roll Number"
+            value={formData.rollNumber}
+            onChange={(e) => setFormData({ ...formData, rollNumber: e.target.value })}
+            placeholder="20CS001"
           />
         </div>
 
-        <button
+        <Input
+          type="tel"
+          label="Phone Number"
+          value={formData.phoneNumber}
+          onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+          placeholder="10-digit number"
+        />
+
+        <Button
           type="submit"
           disabled={loading}
-          className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          className="w-full"
+          variant="primary"
         >
-          {loading ? 'Creating Account...' : 'Sign Up'}
-        </button>
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+              Creating Account...
+            </span>
+          ) : (
+            'Create Account'
+          )}
+        </Button>
       </form>
 
-      <div className="mt-6 text-center text-sm text-gray-600">
-        Already have an account?{' '}
-        <Link to="/login" className="text-primary hover:underline font-medium">
-          Sign in
-        </Link>
+      <div className="mt-8 text-center">
+        <p className="text-neutral-400 text-sm">
+          Already have an account?{' '}
+          <Link to="/login" className="text-white hover:underline font-medium transition-colors">
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { authService } from '../services/authService';
+import { Button, Input } from '../components/ui';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -30,60 +31,61 @@ const Login = () => {
   };
 
   return (
-    <div className="bg-red-500 p-20">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Sign In</h2>
+    <div className="p-8">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-white mb-2">Welcome Back</h2>
+        <p className="text-neutral-400 text-sm">Sign in to access your dashboard</p>
+      </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
+        <div className="mb-6 p-4 bg-red-950/50 border border-red-800 rounded-xl text-red-400 text-sm backdrop-blur-sm">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            required
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="your.email@puchd.ac.in"
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <Input
+          type="email"
+          label="Email Address"
+          required
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          placeholder="your.email@puchd.ac.in"
+        />
 
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-            Password
-          </label>
-          <input
-            type="password"
-            id="password"
-            required
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="••••••••"
-          />
-        </div>
+        <Input
+          type="password"
+          label="Password"
+          required
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          placeholder="Enter your password"
+        />
 
-        <button
+        <Button
           type="submit"
           disabled={loading}
-          className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          className="w-full"
+          variant="primary"
         >
-          {loading ? 'Signing in...' : 'Sign In'}
-        </button>
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+              Signing in...
+            </span>
+          ) : (
+            'Sign In'
+          )}
+        </Button>
       </form>
 
-      <div className="mt-6 text-center text-sm text-gray-600">
-        Don't have an account?{' '}
-        <Link to="/signup" className="text-primary hover:underline font-medium">
-          Sign up
-        </Link>
+      <div className="mt-8 text-center">
+        <p className="text-neutral-400 text-sm">
+          Don't have an account?{' '}
+          <Link to="/signup" className="text-white hover:underline font-medium transition-colors">
+            Create one
+          </Link>
+        </p>
       </div>
     </div>
   );

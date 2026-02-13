@@ -38,3 +38,6 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
+
+console.log("API URL:", API_URL);
+
