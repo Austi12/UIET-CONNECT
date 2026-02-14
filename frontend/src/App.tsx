@@ -14,26 +14,27 @@ import LostFound from './pages/LostFound';
 import Projects from './pages/Projects';
 import Events from './pages/Events';
 import Profile from './pages/Profile';
+import UserManagement from './pages/UserManagement';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  
+
   return <>{children}</>;
 };
 
 // Public Route (redirect if authenticated)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  
+
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
-  
+
   return <>{children}</>;
 };
 
@@ -75,6 +76,7 @@ function App() {
           <Route path="/projects" element={<Projects />} />
           <Route path="/events" element={<Events />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/users" element={<UserManagement />} />
         </Route>
 
         {/* Default redirect */}

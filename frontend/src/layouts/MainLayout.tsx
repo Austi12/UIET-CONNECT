@@ -1,15 +1,16 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { 
-  LayoutDashboard, 
-  DoorOpen, 
-  Search, 
-  FolderKanban, 
-  Calendar, 
-  User, 
+import {
+  LayoutDashboard,
+  DoorOpen,
+  Search,
+  FolderKanban,
+  Calendar,
+  User,
   LogOut,
   Menu,
-  X
+  X,
+  ShieldCheck
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -43,7 +44,7 @@ const MainLayout = () => {
           >
             {isSidebarOpen ? <X size={20} className="text-white" /> : <Menu size={20} className="text-white" />}
           </button>
-          
+
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,9 +62,8 @@ const MainLayout = () => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-screen w-64 bg-neutral-950 border-r border-neutral-800 z-40 transform transition-transform duration-200 ease-in-out ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
+        className={`fixed left-0 top-0 h-screen w-64 bg-neutral-950 border-r border-neutral-800 z-40 transform transition-transform duration-200 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          } lg:translate-x-0`}
       >
         {/* Logo */}
         <div className="h-16 px-6 flex items-center gap-3 border-b border-neutral-800">
@@ -100,17 +100,30 @@ const MainLayout = () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setIsSidebarOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                  isActive
-                    ? 'bg-white text-black'
-                    : 'text-neutral-400 hover:text-white hover:bg-neutral-900'
-                }`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
+                  ? 'bg-white text-black'
+                  : 'text-neutral-400 hover:text-white hover:bg-neutral-900'
+                  }`}
               >
                 <Icon size={20} className={isActive ? 'text-black' : 'group-hover:scale-110 transition-transform'} />
                 <span className="font-medium">{item.label}</span>
               </Link>
             );
           })}
+
+          {user?.role === 'ADMIN' && (
+            <Link
+              to="/users"
+              onClick={() => setIsSidebarOpen(false)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${location.pathname === '/users'
+                  ? 'bg-white text-black'
+                  : 'text-neutral-400 hover:text-white hover:bg-neutral-900'
+                }`}
+            >
+              <ShieldCheck size={20} className={location.pathname === '/users' ? 'text-black' : 'group-hover:scale-110 transition-transform'} />
+              <span className="font-medium">User Management</span>
+            </Link>
+          )}
         </nav>
 
         {/* Bottom Actions */}
@@ -118,11 +131,10 @@ const MainLayout = () => {
           <Link
             to="/profile"
             onClick={() => setIsSidebarOpen(false)}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-              location.pathname === '/profile'
-                ? 'bg-white text-black'
-                : 'text-neutral-400 hover:text-white hover:bg-neutral-900'
-            }`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${location.pathname === '/profile'
+              ? 'bg-white text-black'
+              : 'text-neutral-400 hover:text-white hover:bg-neutral-900'
+              }`}
           >
             <User size={20} className={location.pathname === '/profile' ? 'text-black' : 'group-hover:scale-110 transition-transform'} />
             <span className="font-medium">Profile</span>
