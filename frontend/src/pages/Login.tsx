@@ -21,6 +21,7 @@ const Login = () => {
 
     try {
       const response = await authService.login(formData);
+      // Access nested data property from the API response
       login(response.data.user, response.data.token);
       navigate('/dashboard');
     } catch (err: any) {
