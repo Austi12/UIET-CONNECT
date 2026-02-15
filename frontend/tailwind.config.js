@@ -8,6 +8,10 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Core palette
+        background: '#0B0B0B',
+        foreground: '#FFFFFF',
+
         black: '#0B0B0B',
         neutral: {
           950: '#0F0F0F',
@@ -20,20 +24,24 @@ export default {
           300: '#D4D4D4',
           200: '#E5E5E5',
           100: '#F5F5F5',
-        }
+        },
       },
+
       animation: {
-        'fadeIn': 'fadeIn 0.3s ease-out',
-        'spin': 'spin 1s linear infinite',
+        fadeIn: 'fadeIn 0.3s ease-out',
+        'fade-in': 'fadeIn 0.2s ease-in-out',
+        spin: 'spin 1s linear infinite',
       },
+
       keyframes: {
         fadeIn: {
           '0%': { opacity: '0', transform: 'translateY(10px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },
+
       boxShadow: {
-        'glow': '0 0 20px rgba(255, 255, 255, 0.1)',
+        glow: '0 0 20px rgba(255, 255, 255, 0.1)',
         'glow-lg': '0 0 40px rgba(255, 255, 255, 0.15)',
       },
     },
